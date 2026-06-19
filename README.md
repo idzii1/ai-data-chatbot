@@ -1,22 +1,27 @@
-
 # 🤖 AI Data Analyst
 
-## Overview
+## 📌 Overview
 This project simulates a data analyst.
 
-Users ask questions and the system converts them into SQL queries.
+Users ask questions about data,
+and the system converts them into SQL queries.
 
-## Features
+## 🚀 Features
 - Question → SQL
 - Data analysis
 - Instant results
 
-## Tech Stack
+## 🧠 Example Questions
+- What is total revenue?
+- Show revenue by category
+- What is the trend?
+
+## 🛠 Tech Stack
 - Python
 - SQL
 - Streamlit
 
-## Demo
+## 📊 Demo
 
 ### Chat
 screenshot1.png
@@ -24,5 +29,5 @@ screenshot1.png
 ### Result
 screenshot2.png
 
-## Author
+## 👨‍💻 Author
 Igor Michalak
