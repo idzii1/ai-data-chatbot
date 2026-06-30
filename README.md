@@ -1,33 +1,50 @@
-# 🤖 AI Data Analyst
+# 🚀 AI Data Platform
+
+An interactive data analytics platform that combines dashboarding, machine learning, and a chatbot interface.
 
 ## 📌 Overview
-This project simulates a data analyst.
+This project allows users to upload datasets, explore data through an interactive dashboard, generate insights, and forecast future trends using machine learning models.
 
-Users ask questions about data,
-and the system converts them into SQL queries.
+## ✨ Features
+- 📊 Interactive dashboard (Streamlit)
+- 🎛 Data filtering (Category & Month)
+- 📈 Data visualizations (Plotly)
+- 🤖 Machine Learning models:
+  - Linear Regression
+  - Polynomial Regression
+- 📉 Forecasting future sales
+- 📊 Model comparison using R² score
+- 💬 Chatbot interface for querying data
+- 📄 Export reports (CSV & PDF)
+- 🌙 Dark-mode UI (SaaS-style)
 
-## 🚀 Features
-- Question → SQL
-- Data analysis
-- Instant results
-
-## 🧠 Example Questions
-- What is total revenue?
-- Show revenue by category
-- What is the trend?
-
-## 🛠 Tech Stack
+## 🧠 Technologies
 - Python
-- SQL
+- Pandas
+- Plotly
 - Streamlit
+- Scikit-learn
+- ReportLab
 
-## 📊 Demo
+## 📊 Example Use Cases
+- Analyze sales performance across categories
+- Identify trends over time
+- Predict future revenue
+- Compare machine learning models
+- Generate insights interactively
 
-### Chat
+## 📷 Demo
+
 screenshot1.png
-
-### Result
 screenshot2.png
 
-## 👨‍💻 Author
-Igor Michalak
+## 💡 Key Insights Example
+- Electronics category generates the highest revenue
+- Monthly trends show growth patterns
+- Polynomial model captures nonlinear trends better than linear model
+
+## 🚀 How to Run
+
+```bash
+pip install -r requirements.txt
+python -m streamlit run app.py
