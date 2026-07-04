@@ -1,3 +1,22 @@
+
+AI Data Analyst is an interactive analytics platform that allows users to query business data using natural language.
+
+The application converts user requests into SQL operations, generates visualizations and provides business insights.
+
+## Architecture
+
+User
+↓
+Streamlit
+↓
+NLP Engine
+↓
+SQL Generation
+↓
+SQLite Database
+↓
+Results & Charts
+
 # 🤖 AI Data Analyst Platform
 
 Simple interactive analytics app built with **Python + SQL + Streamlit**.
@@ -151,13 +170,31 @@ sqlite3.connect("app.db", check_same_thread=False)
 
 screenshots/dashboard.png
 
+
+<img width="3361" height="1177" alt="image" src="https://github.com/user-attachments/assets/eabe420d-99f6-4bb8-acb9-a0891ade75c4" />
+
+
+
 ### AI SQL Chat
 
 screenshots/chatbot.png
 
+<img width="3357" height="1025" alt="image" src="https://github.com/user-attachments/assets/01ac7803-fbc6-4d8b-8398-2d31b68c38c2" />
+
+
+
 ### Sales Trend Analysis
 
 screenshots/trend.png
+
+<img width="3380" height="1031" alt="image" src="https://github.com/user-attachments/assets/9f9e9fcb-ba73-40cc-b698-fcdb123731f4" />
+
+
+
+## Live Demo
+
+https://ai-data-chatbot-oncpje9tt3j9wg9ws6ozsb.streamlit.a
+
 
 
 ## 👨‍💻 Author
