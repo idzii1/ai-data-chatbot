@@ -145,6 +145,21 @@ sqlite3.connect("app.db", check_same_thread=False)
 
 ---
 
+## Screenshots
+
+### Dashboard
+
+screenshots/dashboard.png
+
+### AI SQL Chat
+
+screenshots/chatbot.png
+
+### Sales Trend Analysis
+
+screenshots/trend.png
+
+
 ## 👨‍💻 Author
 
 Igor Michalak
