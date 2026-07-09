@@ -13,8 +13,10 @@ st.set_page_config(
 # =====================
 # DATABASE
 # =====================
-# If you want persistence between reruns/restarts, replace ':memory:' with 'app.db'
 conn = sqlite3.connect(":memory:", check_same_thread=False)
+
+MONTH_ORDER = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+               "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
 # =====================
 # TITLE
@@ -23,37 +25,70 @@ st.title("🤖 AI Data Analyst Platform")
 st.caption("Python + SQL + Streamlit")
 
 # =====================
-# FILE UPLOAD
+# FILE UPLOAD (improved)
 # =====================
-uploaded_file = st.file_uploader("Upload CSV file", type=["csv"])
+uploaded_file = st.file_uploader(
+    "Upload your own CSV (optional)",
+    type=["csv"]
+)
 
-if uploaded_file is not None:
-    try:
+try:
+    # If user uploads a file
+    if uploaded_file is not None:
         df = pd.read_csv(uploaded_file)
+        st.success("Custom dataset loaded ✅")
 
-        # Validation
-        required_cols = {"Sales", "Category"}
-        missing = required_cols - set(df.columns)
-        if missing:
-            st.error(f"Missing required columns: {', '.join(sorted(missing))}")
-            st.stop()
+    # If not, use local demo file
+    else:
+        df = pd.read_csv("ecommerce.csv")
+        st.info("Using built-in demo dataset (ecommerce.csv)")
 
-        # Cleaning
-        df["Sales"] = pd.to_numeric(df["Sales"], errors="coerce")
-        df = df.dropna(subset=["Sales"]).copy()
-        df["Category"] = df["Category"].astype(str).str.strip()
+    # Optional: normalize column names (handles e.g. "sales", " category ")
+    df.columns = [c.strip() for c in df.columns]
+    col_map = {c.lower(): c for c in df.columns}
 
-        if "Month" in df.columns:
-            df["Month"] = df["Month"].astype(str).str.strip().str.title()
-
-        df.to_sql("sales", conn, index=False, if_exists="replace")
-        st.success("Dataset loaded successfully ✅")
-
-    except Exception as e:
-        st.error(f"Upload/parse error: {e}")
+    # Require at least Sales + Category
+    if "sales" not in col_map or "category" not in col_map:
+        st.error("Missing required columns: Sales, Category")
         st.stop()
-else:
-    st.info("Upload ecommerce.csv to continue")
+
+    # Rename detected columns to standard names
+    rename_dict = {}
+    if col_map.get("sales") != "Sales":
+        rename_dict[col_map["sales"]] = "Sales"
+    if col_map.get("category") != "Category":
+        rename_dict[col_map["category"]] = "Category"
+    if "month" in col_map and col_map.get("month") != "Month":
+        rename_dict[col_map["month"]] = "Month"
+    if "customer_id" in col_map and col_map.get("customer_id") != "Customer_ID":
+        rename_dict[col_map["customer_id"]] = "Customer_ID"
+
+    if rename_dict:
+        df = df.rename(columns=rename_dict)
+
+    # Cleaning
+    df["Sales"] = pd.to_numeric(df["Sales"], errors="coerce")
+    df["Category"] = df["Category"].astype(str).str.strip()
+
+    if "Month" in df.columns:
+        df["Month"] = df["Month"].astype(str).str.strip().str.title()
+        df = df[df["Month"].isin(MONTH_ORDER)]
+
+    df = df.dropna(subset=["Sales"]).copy()
+    df = df[df["Category"].ne("")]
+
+    if df.empty:
+        st.error("Dataset is empty after cleaning.")
+        st.stop()
+
+    # Load into SQLite
+    df.to_sql("sales", conn, index=False, if_exists="replace")
+
+except FileNotFoundError:
+    st.error("Default file 'ecommerce.csv' was not found.")
+    st.stop()
+except Exception as e:
+    st.error(f"Data loading error: {e}")
     st.stop()
 
 # =====================
@@ -80,7 +115,6 @@ except Exception as e:
     st.stop()
 
 col1, col2 = st.columns(2)
-
 col1.metric("💰 Revenue", f"${float(revenue.iloc[0, 0]):,.2f}")
 col2.metric("📦 Orders", int(orders.iloc[0, 0]))
 
@@ -133,9 +167,6 @@ for msg in st.session_state.messages:
 # =====================
 # NLP + SQL
 # =====================
-MONTH_ORDER = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
-               "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-
 def extract_top_n(question: str, default_n: int = 1) -> int:
     m = re.search(r"\btop\s+(\d+)\b", question.lower())
     if m:
@@ -155,7 +186,7 @@ def answer_question(question: str):
         text = f"Total revenue = **${float(result.iloc[0, 0]):,.2f}**"
         return {"text": text, "sql": sql, "df": result}
 
-    # top n categories (e.g., "top 3 categories")
+    # top n categories
     if "top" in q and "categor" in q:
         n = extract_top_n(q, default_n=1)
         sql = f"""
@@ -169,8 +200,7 @@ def answer_question(question: str):
         """
         result = pd.read_sql_query(sql, conn)
         fig = px.bar(result, x="Category", y="Revenue", color="Category", title=f"Top {n} Categories")
-        text = f"Top **{len(result)}** categories:"
-        return {"text": text, "sql": sql, "df": result, "fig": fig}
+        return {"text": f"Top **{len(result)}** categories:", "sql": sql, "df": result, "fig": fig}
 
     # top category
     if "top category" in q:
@@ -203,7 +233,6 @@ def answer_question(question: str):
 
     # trend
     if "trend" in q or "over time" in q or "month" in q:
-        # requires Month column
         cols = pd.read_sql_query("PRAGMA table_info(sales)", conn)["name"].tolist()
         if "Month" not in cols:
             return {"text": "This dataset has no `Month` column, so trend cannot be computed."}
@@ -286,4 +315,3 @@ if question:
             st.dataframe(result["df"], use_container_width=True)
         if "fig" in result:
             st.plotly_chart(result["fig"], use_container_width=True)
- 
